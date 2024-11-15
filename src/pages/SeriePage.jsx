@@ -1,41 +1,70 @@
-import HeaderComponent from "../components/HeaderComponent"
-import SerieComponent from "../components/SerieComponent"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import HeaderComponent from "../components/HeaderComponent";
 
-function SeriePage(){
-    const series = [
-        {cod:1, nom:"Friends", cat:"Comedy", img:"friends.png"},
-        {cod:2, nom:"Law & Order", cat:"Drama", img:"law-and-order.png"},
-        {cod:3, nom:"The Big Bang Theory", cat:"Comedy", img:"the-big-bang.png"},
-        {cod:4, nom:"Stranger Things", cat:"Horror", img:"stranger-things.png"},
-        {cod:5, nom:"Dr. House", cat:"Drama", img:"dr-house.png"},
-        {cod:6, nom:"The X-Files", cat:"Drama", img:"the-x-files.png"},
-      ];
+const SeriePage = () => {
+    const [series, setSeries] = useState([]);
+    const apiUrl = "http://localhost:8000/api/v1/series/";
 
-      return (
-        <>
+    useEffect(() => {
+        loadSeries();
+    }, []);
+
+    const loadSeries = async () => {
+        try {
+            const response = await axios.get(apiUrl);
+            setSeries(response.data);
+        } catch (error) {
+            console.error("Error al cargar series:", error);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`${apiUrl}${id}/`);
+            loadSeries(); // Actualiza la lista después de eliminar
+        } catch (error) {
+            console.error("Error al eliminar serie:", error);
+        }
+    };
+
+    return (
+        <div>
             <HeaderComponent />
-            <div className="container mt-3">
-                <div className="d-flex justify-content-between border-bottom pb-3 mb-3">
-                    <h3>Series</h3>
-                    <div>
-                        <a className="btn btn-primary" href="#">Nuevo</a>
-                    </div>
-                </div>
-                <div className="row">
-                    {series.map((serie)=>(
-                    <div key={serie.cod} className="col-md-3 mb-3">
-                        <SerieComponent
-                        	codigo={serie.cod}
-                        	nombre={serie.nom}
-                        	categoria={serie.cat}
-                        	imagen={serie.img}
-                        />
-                    </div>
-                    ))}
-                </div>
+            <div className="container mt-4">
+                <h1>Series</h1>
+                <Link to="/series/new" className="btn btn-primary mb-3">Nueva Serie</Link>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {series.map((serie) => (
+                            <tr key={serie.id}>
+                                <td>{serie.id}</td>
+                                <td>{serie.name}</td>
+                                <td>{serie.category}</td>
+                                <td>
+                                    <Link to={`/series/edit/${serie.id}`} className="btn btn-warning me-2">
+                                        Editar
+                                    </Link>
+                                    <button onClick={() => handleDelete(serie.id)} className="btn btn-danger">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
-        </>
-      )
-}
+        </div>
+    );
+};
 
-export default SeriePage
+export default SeriePage;

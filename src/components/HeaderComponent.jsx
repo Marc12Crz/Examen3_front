@@ -1,36 +1,34 @@
-import { NavLink } from "react-router-dom"
+import { Link } from "react-router-dom";
 
-function HeaderComponent() {
-
+const HeaderComponent = () => {
     return (
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
-                <span className="navbar-brand mb-0 h1">SeriesApp</span>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <Link className="navbar-brand" to="/home">Laboratorio</Link>
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
                     <span className="navbar-toggler-icon"></span>
                 </button>
-                <div className="collapse navbar-collapse" id="navbarText">
-                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                <div className="collapse navbar-collapse" id="navbarNav">
+                    <ul className="navbar-nav">
                         <li className="nav-item">
-                            <NavLink className="nav-link" href="/home">Inicio</NavLink>
+                            <Link className="nav-link" to="/categories">Categorías</Link>
                         </li>
                         <li className="nav-item">
-                            <NavLink className="nav-link" href="/categories">Categorías</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink className="nav-link" href="/series">Series</NavLink>
+                            <Link className="nav-link" to="/series">Series</Link>
                         </li>
                     </ul>
-                    <div>
-                        Bienvenido Jhon Due 
-                        <div className="text-end">
-                            <a href="/">Salir</a>
-                        </div> 
-                    </div>
                 </div>
             </div>
         </nav>
-    )
-}
-  
-export default HeaderComponent
+    );
+};
+
+export default HeaderComponent;
