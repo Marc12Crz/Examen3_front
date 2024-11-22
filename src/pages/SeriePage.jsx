@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import HeaderComponent from "../components/HeaderComponent";
 
 const SeriePage = () => {
     const [series, setSeries] = useState([]);
-    const apiUrl = "http://localhost:8000/api/v1/series/";
+    const apiUrl = "http://127.0.0.1:8000/series/api/v1/series/";
 
     useEffect(() => {
         loadSeries();
@@ -16,16 +16,18 @@ const SeriePage = () => {
             const response = await axios.get(apiUrl);
             setSeries(response.data);
         } catch (error) {
-            console.error("Error al cargar series:", error);
+            console.error("Error al cargar las series:", error);
         }
     };
 
     const handleDelete = async (id) => {
-        try {
-            await axios.delete(`${apiUrl}${id}/`);
-            loadSeries(); // Actualiza la lista después de eliminar
-        } catch (error) {
-            console.error("Error al eliminar serie:", error);
+        if (window.confirm("¿Estás seguro de eliminar esta serie?")) {
+            try {
+                await axios.delete(`${apiUrl}${id}/`);
+                loadSeries(); // Recarga las series después de eliminar
+            } catch (error) {
+                console.error("Error al eliminar la serie:", error);
+            }
         }
     };
 
@@ -33,9 +35,9 @@ const SeriePage = () => {
         <div>
             <HeaderComponent />
             <div className="container mt-4">
-                <h1>Series</h1>
+                <h1>Lista de Series</h1>
                 <Link to="/series/new" className="btn btn-primary mb-3">Nueva Serie</Link>
-                <table className="table">
+                <table className="table table-bordered">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -49,14 +51,10 @@ const SeriePage = () => {
                             <tr key={serie.id}>
                                 <td>{serie.id}</td>
                                 <td>{serie.name}</td>
-                                <td>{serie.category}</td>
+                                <td>{serie.category_description || "Sin categoría"}</td>
                                 <td>
-                                    <Link to={`/series/edit/${serie.id}`} className="btn btn-warning me-2">
-                                        Editar
-                                    </Link>
-                                    <button onClick={() => handleDelete(serie.id)} className="btn btn-danger">
-                                        Eliminar
-                                    </button>
+                                    <Link to={`/series/${serie.id}/edit`} className="btn btn-warning me-2">Editar</Link>
+                                    <button onClick={() => handleDelete(serie.id)} className="btn btn-danger">Eliminar</button>
                                 </td>
                             </tr>
                         ))}

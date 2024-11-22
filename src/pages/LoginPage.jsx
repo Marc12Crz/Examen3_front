@@ -1,15 +1,47 @@
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../contexts/AppContext";
+import { loginService } from "../service/LoginServices";
 
-function LoginPage(){
+const initData = {
+    username: "",
+    password: "",
+};
+
+function LoginPage() {
     const navigate = useNavigate();
-    
-    const handleSubmit = async (e)=>{
+    const { login } = useContext(AppContext); 
+    const [data, setData] = useState(initData);
+    const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
+
+    const onChangeUserName = (e) => {
+        const nData = { ...data, username: e.target.value };
+        setData(nData);
+    };
+
+    const onChangePassword = (e) => {
+        const nData = { ...data, password: e.target.value };
+        setData(nData);
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword); // Alternar entre mostrar y ocultar la contraseña
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        navigate("/series");
-    }
+        try {
+            const resp = await loginService(data);
+            console.log(resp.data);
+            login(resp.data);
+            navigate("/series");
+        } catch (error) {
+            window.alert("El usuario o contraseña no es correcto");
+        }
+    };
 
     return (
-    	<section className="d-flex justify-content-center align-items-center min-vh-100">
+        <section className="d-flex justify-content-center align-items-center min-vh-100">
             <div className="container">
                 <div className="row justify-content-sm-center">
                     <div className="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
@@ -18,8 +50,17 @@ function LoginPage(){
                                 <h1 className="fs-4 card-title fw-bold mb-4">Login</h1>
                                 <form onSubmit={handleSubmit} autoComplete="off">
                                     <div className="mb-3">
-                                        <label className="mb-2 text-muted" htmlFor="email">E-Mail</label>
-                                        <input id="email" type="email" className="form-control" name="email" required autoFocus />
+                                        <label className="mb-2 text-muted" htmlFor="username">Usuario</label>
+                                        <input
+                                            id="username"
+                                            type="text"
+                                            className="form-control"
+                                            name="username"
+                                            value={data.username}
+                                            onChange={onChangeUserName}
+                                            required
+                                            autoFocus
+                                        />
                                     </div>
                                     <div className="mb-3">
                                         <div className="mb-2 w-100">
@@ -28,11 +69,33 @@ function LoginPage(){
                                                 Recuperar Contraseña?
                                             </a>
                                         </div>
-                                        <input id="password" type="password" className="form-control" name="password" required />
+                                        <div className="input-group">
+                                            <input
+                                                id="password"
+                                                type={showPassword ? "text" : "password"} // Cambiar entre texto y contraseña
+                                                className="form-control"
+                                                name="password"
+                                                value={data.password}
+                                                onChange={onChangePassword}
+                                                required
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-secondary"
+                                                onClick={togglePasswordVisibility}
+                                            >
+                                                {showPassword ? "🙈" : "👁️"}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="d-flex align-items-center">
                                         <div className="form-check">
-                                            <input type="checkbox" name="remember" id="remember" className="form-check-input" />
+                                            <input
+                                                type="checkbox"
+                                                name="remember"
+                                                id="remember"
+                                                className="form-check-input"
+                                            />
                                             <label htmlFor="remember" className="form-check-label">Recordarme</label>
                                         </div>
                                         <button type="submit" className="btn btn-primary ms-auto">
@@ -48,7 +111,7 @@ function LoginPage(){
                     </div>
                 </div>
             </div>
-    	</section>
+        </section>
     );
 }
 

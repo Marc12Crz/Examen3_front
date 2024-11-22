@@ -1,42 +1,36 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { getAllCategoryService, deleteCategoryService } from "../service/CategoryService";
 import { Link } from "react-router-dom";
-import HeaderComponent from "../components/HeaderComponent";
+import HeaderComponent from "../components/HeaderComponent"; // Importar el HeaderComponent
 
-const CategoryPage = () => {
+function CategoryPage() {
     const [categories, setCategories] = useState([]);
-    const apiUrl = "http://localhost:8000/api/v1/categories/";
+
+    const loadCategories = async () => {
+        const resp = await getAllCategoryService();
+        setCategories(resp.data);
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm("¿Estás seguro de eliminar esta categoría?")) {
+            await deleteCategoryService(id);
+            loadCategories();
+        }
+    };
 
     useEffect(() => {
         loadCategories();
     }, []);
 
-    const loadCategories = async () => {
-        try {
-            const response = await axios.get(apiUrl);
-            setCategories(response.data);
-        } catch (error) {
-            console.error("Error al cargar categorías:", error);
-        }
-    };
-
-    const handleDelete = async (id) => {
-        try {
-            await axios.delete(`${apiUrl}${id}/`);
-            loadCategories(); // Actualiza la lista después de eliminar
-        } catch (error) {
-            console.error("Error al eliminar categoría:", error);
-        }
-    };
     return (
         <div>
-            <HeaderComponent />
-            <div className="container mt-4">
-                <h1>Categorías</h1>
-                <Link to="/categories/new" className="btn btn-primary mb-3">
+            <HeaderComponent /> {/* Agregar el HeaderComponent */}
+            <div className="container">
+                <h1>Lista de Categorías</h1>
+                <Link to="/categories/new" className="btn btn-primary">
                     Nueva Categoría
                 </Link>
-                <table className="table">
+                <table className="table mt-3">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -50,7 +44,16 @@ const CategoryPage = () => {
                                 <td>{category.id}</td>
                                 <td>{category.description}</td>
                                 <td>
-                                    <button onClick={() => handleDelete(category.id)} className="btn btn-danger">
+                                    <Link
+                                        to={`/categories/${category.id}/edit`}
+                                        className="btn btn-warning me-2"
+                                    >
+                                        Editar
+                                    </Link>
+                                    <button
+                                        onClick={() => handleDelete(category.id)}
+                                        className="btn btn-danger"
+                                    >
                                         Eliminar
                                     </button>
                                 </td>
@@ -61,6 +64,6 @@ const CategoryPage = () => {
             </div>
         </div>
     );
-};
+}
 
 export default CategoryPage;

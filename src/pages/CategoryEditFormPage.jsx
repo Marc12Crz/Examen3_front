@@ -1,16 +1,25 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createCategoryService } from "../service/CategoryService";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { showCategoryService, updateCategoryService } from "../service/CategoryService";
 import HeaderComponent from "../components/HeaderComponent"; // Importar el HeaderComponent
 
-function CategoryFormPage() {
+function CategoryEditFormPage() {
+    const { id } = useParams();
     const [description, setDescription] = useState("");
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const loadCategory = async () => {
+            const resp = await showCategoryService(id);
+            setDescription(resp.data.description);
+        };
+        loadCategory();
+    }, [id]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await createCategoryService({ description });
+            await updateCategoryService(id, { description });
             navigate("/categories");
         } catch (error) {
             console.error(error);
@@ -21,7 +30,7 @@ function CategoryFormPage() {
         <div>
             <HeaderComponent /> {/* Agregar el HeaderComponent */}
             <div className="container">
-                <h1>Nueva Categoría</h1>
+                <h1>Editar Categoría</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label htmlFor="description" className="form-label">
@@ -43,4 +52,4 @@ function CategoryFormPage() {
     );
 }
 
-export default CategoryFormPage;
+export default CategoryEditFormPage;
